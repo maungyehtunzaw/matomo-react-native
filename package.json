@@ -1,17 +1,53 @@
 {
-  "name": "matomo-tracker-react-native",
-  "version": "0.3.3",
-  "description": "Stand alone library for using Matomo tracking in React Native and Expo projects.",
+  "name": "matomo-react-native",
+  "version": "1.0.0",
+  "description": "Enhanced Matomo tracking library for React Native and Expo projects with TypeScript support and automatic platform detection.",
   "license": "MIT",
-  "repository": "donni106/matomo-tracker-react-native",
-  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maungyehtunzaw/matomo-react-native.git"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "keywords": [
     "matomo",
     "react native",
-    "expo"
+    "expo",
+    "analytics",
+    "tracking",
+    "typescript",
+    "platform-detection",
+    "mobile-analytics"
   ],
-  "author": "Daniel <dm@tpwd.de>",
+  "author": "maungyehtunzaw <maungyehtunzaw@gmail.com>",
   "bugs": {
-    "url": "https://github.com/donni106/matomo-tracker-react-native/issues"
+    "url": "https://github.com/maungyehtunzaw/matomo-react-native/issues"
+  },
+  "homepage": "https://github.com/maungyehtunzaw/matomo-react-native#readme",
+  "files": [
+    "lib",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf lib",
+    "prepublishOnly": "npm run clean && npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node tests/simple-test.js",
+    "test:simple": "npm run build && node tests/simple-test.js"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-native": "^0.72.0",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-native": ">=0.60.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
