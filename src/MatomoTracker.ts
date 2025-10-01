@@ -102,12 +102,8 @@ class MatomoTracker {
     // Build tracking data with Matomo API parameters
     const trackingData: Record<string, any> = {
       action_name: 'App / start',
+      url: url || 'https://app/start', // Default URL if not provided
     };
-
-    // Add URL if provided
-    if (url) {
-      trackingData.url = url;
-    }
 
     // Add referrer URL (urlref parameter in Matomo API)
     if (referrer) {
@@ -201,7 +197,8 @@ class MatomoTracker {
     }
     this.updateUserInfo(userInfo);
 
-    return this.track({ action_name: name, url });
+    // Ensure URL is always provided (will be auto-generated if not provided)
+    return this.track({ action_name: name, url: url || undefined });
   }
 
   /**
@@ -383,6 +380,13 @@ class MatomoTracker {
    */
   private addCommonParameters(data: Record<string, any>): Record<string, any> {
     const enhancedData = { ...data };
+
+    // Add URL if not provided (required by Matomo API)
+    // Using a default app URL with action name to ensure tracking works properly
+    if (!enhancedData.url) {
+      const actionName = enhancedData.action_name || 'app';
+      enhancedData.url = `https://app/${actionName.toLowerCase().replace(/\s+/g, '-').replace(/\//g, '-')}`;
+    }
 
     // Add random parameter to avoid caching (recommended by Matomo API)
     if (!enhancedData.rand) {
