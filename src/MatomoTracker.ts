@@ -381,11 +381,16 @@ class MatomoTracker {
   private addCommonParameters(data: Record<string, any>): Record<string, any> {
     const enhancedData = { ...data };
 
-    // Add URL if not provided (required by Matomo API)
-    // Using a default app URL with action name to ensure tracking works properly
+    // Ensure URL is always absolute (required by Matomo API)
+    // Matomo requires "The full URL for the current action" - relative URLs are rejected
     if (!enhancedData.url) {
+      // No URL provided - generate from action name
       const actionName = enhancedData.action_name || 'app';
       enhancedData.url = `https://app/${actionName.toLowerCase().replace(/\s+/g, '-').replace(/\//g, '-')}`;
+    } else if (!enhancedData.url.startsWith('http://') && !enhancedData.url.startsWith('https://')) {
+      // Relative URL provided - convert to absolute
+      const path = enhancedData.url.startsWith('/') ? enhancedData.url : `/${enhancedData.url}`;
+      enhancedData.url = `https://app${path}`;
     }
 
     // Add random parameter to avoid caching (recommended by Matomo API)

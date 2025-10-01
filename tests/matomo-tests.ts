@@ -10,7 +10,11 @@ export async function testBasicAppStart() {
   console.log('🧪 Testing basic app start tracking...');
   
   try {
-    await testInstance.trackAppStart();
+    await testInstance.trackAppStart({
+      userInfo: {
+        uid: `test-user-basic-${Date.now()}`
+      }
+    });
     console.log('✅ Basic app start tracking successful');
     return true;
   } catch (error) {
@@ -29,7 +33,7 @@ export async function testEnhancedAppStart() {
       referrer: 'https://sonaku.vip',
       platform: 'ios',
       userInfo: {
-        uid: 'test-user-enhanced',
+        uid: `test-user-enhanced-${Date.now()}`,
         resolution: '1920x1080'
       }
     });
@@ -50,7 +54,7 @@ export async function testPageView() {
       name: 'Test Home Page',
       url: '/home',
       userInfo: {
-        uid: 'test-user-pageview'
+        uid: `test-user-pageview-${Date.now()}`
       }
     });
     console.log('✅ Page view tracking successful');
@@ -70,7 +74,7 @@ export async function testScreenView() {
       name: 'Test Settings Screen',
       url: '/settings',
       userInfo: {
-        uid: 'test-user-screen'
+        uid: `test-user-screen-${Date.now()}`
       }
     });
     console.log('✅ Screen view tracking successful');
@@ -94,7 +98,7 @@ export async function testEventTracking() {
       campaign: 'test-campaign-2024',
       url: '/test-event',
       userInfo: {
-        uid: 'test-user-event'
+        uid: `test-user-event-${Date.now()}`
       }
     });
     console.log('✅ Event tracking successful');
@@ -115,7 +119,7 @@ export async function testContentTracking() {
       contentPiece: 'banner-homepage.jpg',
       contentTarget: 'https://sonaku.vip/promo',
       userInfo: {
-        uid: 'test-user-content'
+        uid: `test-user-content-${Date.now()}`
       }
     });
     console.log('✅ Content tracking successful');
@@ -136,7 +140,7 @@ export async function testSiteSearch() {
       category: 'Test Category',
       count: 5,
       userInfo: {
-        uid: 'test-user-search'
+        uid: `test-user-search-${Date.now()}`
       }
     });
     console.log('✅ Site search tracking successful');
@@ -155,7 +159,7 @@ export async function testLinkTracking() {
     await testInstance.trackLink({
       link: 'https://external-link.com',
       userInfo: {
-        uid: 'test-user-link'
+        uid: `test-user-link-${Date.now()}`
       }
     });
     console.log('✅ Link tracking successful');
@@ -174,7 +178,7 @@ export async function testDownloadTracking() {
     await testInstance.trackDownload({
       download: 'https://sonaku.vip/files/test-document.pdf',
       userInfo: {
-        uid: 'test-user-download'
+        uid: `test-user-download-${Date.now()}`
       }
     });
     console.log('✅ Download tracking successful');
@@ -192,7 +196,7 @@ export async function testUserInfoManagement() {
   try {
     // Update user info
     testInstance.updateUserInfo({
-      uid: 'test-user-updated',
+      uid: `test-user-updated-${Date.now()}`,
       resolution: '2560x1440',
       language: 'en'
     });
