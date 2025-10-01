@@ -16,7 +16,7 @@
     "declaration": true,
     "declarationDir": "lib",
     "outDir": "lib",
-    "jsx": "react-native"
+    "jsx": "react",
   },
   "include": [
     "src/**/*",
