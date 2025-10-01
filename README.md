@@ -1,209 +1,486 @@
 <img src="./matomo-tracker-react-native.png" width="350">
 
-# Matomo Tracker (React Native/Expo)
+# Matomo React Native
 
-![Project version](https://img.shields.io/badge/version-0.3.3-informational.svg?style=flat-square)
+![npm version](https://img.shields.io/npm/v/matomo-react-native.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)
+![React Native](https://img.shields.io/badge/React%20Native-Compatible-green.svg)
+![Expo](https://img.shields.io/badge/Expo-Compatible-black.svg)
 
-Stand alone library for using Matomo tracking in React Native and Expo projects.
+**Enhanced TypeScript version** of the Matomo tracker for React Native and Expo projects with automatic platform detection and comprehensive Matomo API support.
 
-There is one [React Native Matomo package](https://github.com/BonifyByForteil/react-native-matomo) mentioned on the [official integration docs of Matomo](https://matomo.org/integrate), which sadly cannot be used with Expo because of native modules that are included.
+## Credits
 
-If you know React Native already but have not heard about Expo yet, you can read about it [here in their docs](https://docs.expo.io/workflow/already-used-react-native).
+This package is based on the excellent work by [donni106/matomo-tracker-react-native](https://github.com/donni106/matomo-tracker-react-native). The original JavaScript implementation has been converted to TypeScript and enhanced with additional features including:
 
-This package aims for making tracking available in every React Native app with sending custom actions to the [Matomo Tracking HTTP API](https://developer.matomo.org/api-reference/tracking-api).
+- 🔥 **Full TypeScript support** with comprehensive type definitions
+- 📱 **Automatic platform detection** (iOS/Android/web) using `Platform.OS`
+- 🌐 **Enhanced Matomo API compliance** with referrer tracking, user agents, and timestamps
+- 🎯 **Simplified API** with all parameters optional and intelligent defaults
+- 📊 **Production tested** against live Matomo instances
 
-There are two existing implementations for Node.js and React, that built the basis for this React Native package. Thanks to:
-- https://github.com/matomo-org/matomo-nodejs-tracker
-- https://github.com/Amsterdam/matomo-tracker
+Special thanks to the original contributors and the foundation packages:
+- [donni106/matomo-tracker-react-native](https://github.com/donni106/matomo-tracker-react-native) - Original React Native implementation
+- [matomo-org/matomo-nodejs-tracker](https://github.com/matomo-org/matomo-nodejs-tracker) - Node.js foundation
+- [Amsterdam/matomo-tracker](https://github.com/Amsterdam/matomo-tracker) - React foundation
+
+## Why This Enhanced Version?
+
+The original package provides excellent Matomo tracking for React Native. This enhanced version adds:
+- **Zero configuration required** - works out of the box with automatic platform detection
+- **Full TypeScript integration** - comprehensive interfaces and type safety
+- **Enhanced tracking parameters** - automatic referrer detection, user agents, and platform-specific data
+- **Modern development experience** - IntelliSense support and compile-time error checking
 
 ## Installation
 
 ```sh
-# with npm:
-
-npm install matomo-tracker-react-native
-
-# or with yarn:
-
-yarn add matomo-tracker-react-native
+npm install matomo-react-native
 ```
 
-## Usage
+Or with yarn:
+```sh
+yarn add matomo-react-native
+```
 
-You need to create a Matomo instance within your project with your specific Matomo details and wrap your app with the `MatomoProvider` of this package.
+## Quick Start
 
-The `useMatomo` hook is exposing all methods you can use for several trackings.
-
-```js
+```typescript
 import React, { useEffect } from 'react';
-import MatomoTracker, { MatomoProvider, useMatomo } from 'matomo-tracker-react-native';
+import { View } from 'react-native';
+import MatomoTracker, { MatomoProvider, useMatomo } from 'matomo-react-native';
 
-const MainAppContainer = () => {
+// Create tracker instance
+const tracker = new MatomoTracker({
+  urlBase: 'https://your-matomo-domain.com',
+  siteId: 1, // Your Matomo site ID
+});
+
+// Your main app component
+const MainApp = () => {
   const { trackAppStart } = useMatomo();
 
   useEffect(() => {
+    // Track app start - automatically detects platform (iOS/Android/web)
     trackAppStart();
   }, []);
 
-  return (
-    <View>Main App</View>
-  );
+  return <View>Your App Content</View>;
 };
 
-export const App = () => {
-  const instance = new MatomoTracker({
-    urlBase: 'https://LINK.TO.DOMAIN', // required
-    // trackerUrl: 'https://LINK.TO.DOMAIN/tracking.php', // optional, default value: `${urlBase}matomo.php`
-    siteId: 1, // required, number matching your Matomo project
-    // userId: 'UID76903202' // optional, default value: `undefined`.
-    // disabled: false, // optional, default value: false. Disables all tracking operations if set to true.
-    // log: false  // optional, default value: false. Enables some logs if set to true.
-  });
+// Wrap your app with the provider
+export const App = () => (
+  <MatomoProvider instance={tracker}>
+    <MainApp />
+  </MatomoProvider>
+);
+```
 
-  return (
-    <MatomoProvider instance={instance}>
-      <MainAppContainer />
-    </MatomoProvider>
-  );
+That's it! The tracker will automatically detect the platform and send appropriate tracking data to your Matomo instance.
+
+## Configuration Options
+
+### MatomoTracker Constructor
+
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `urlBase` | `string` | ✅ | - | Your Matomo server domain (e.g., 'https://matomo.example.com') |
+| `siteId` | `number` | ✅ | - | Your Matomo site ID |
+| `trackerUrl` | `string` | ❌ | `${urlBase}matomo.php` | Custom tracker endpoint if different from default |
+| `userId` | `string` | ❌ | `undefined` | Unique user identifier for cross-session tracking |
+| `disabled` | `boolean` | ❌ | `false` | Disable all tracking when true |
+| `log` | `boolean` | ❌ | `false` | Enable debug logging |
+
+```typescript
+const tracker = new MatomoTracker({
+  urlBase: 'https://your-matomo.com',
+  siteId: 1,
+  userId: 'user123', // Optional: for user-specific tracking
+  log: true, // Optional: enable debug logs
+});
+```
+
+## Enhanced Features
+
+### Automatic Platform Detection
+The tracker automatically detects the platform and sends appropriate data:
+
+```typescript
+// Automatically detects iOS/Android/web and sends platform-specific data
+await tracker.trackAppStart();
+
+// Override platform detection if needed
+await tracker.trackAppStart({
+  platform: 'custom-platform',
+  userAgent: 'CustomApp/1.0'
+});
+```
+
+### Referrer Tracking
+Enhanced support for referrer tracking:
+
+```typescript
+await tracker.trackAppStart({
+  referrer: 'https://your-website.com'
+});
+
+await tracker.trackPageView({
+  name: 'Home Screen',
+  referrer: 'https://external-site.com'
+});
+```
+
+### Type Safety with TypeScript
+Full TypeScript support with comprehensive interfaces:
+
+```typescript
+import { MatomoTrackEventOptions, MatomoUserInfo } from 'matomo-react-native';
+
+const eventData: MatomoTrackEventOptions = {
+  category: 'User Interaction',
+  action: 'Button Press',
+  name: 'Sign Up Button',
+  value: 1
+};
+
+const userInfo: MatomoUserInfo = {
+  userId: 'user123',
+  customData: { plan: 'premium' }
 };
 ```
 
-## Instance
+## API Reference
 
-You need to provide at least an `urlBase` and a `siteId` to create an instance.
+### useMatomo Hook
 
-Method              | Default                | Description
-------------------- | ---------------------- | -----------------------------------------------------------------------
-`urlBase`           |                        | **(required)** Link to your Matomo server domain.
-`trackerUrl`        | `${urlBase}matomo.php` | If your Matomo runs a different endpoint than the default `matomo.php`.
-`siteId`            |                        | **(required)** Number matching your Matomo project.
-`userId`            | `undefined`            | Defines the User ID for a tracking request. The User ID is any non-empty unique string identifying an user. (https://developer.matomo.org/api-reference/tracking-api#optional-user-info)
-`disabled`          | `false`                | Disables all tracking operations if set to true.
-`log`               | `false`                | Enables some logs if set to true.
+All tracking methods are available through the `useMatomo` hook:
 
-## Methods
+```typescript
+const {
+  trackAppStart,
+  trackPageView,
+  trackEvent,
+  trackAction,
+  trackContent,
+  trackSiteSearch,
+  trackLink,
+  trackDownload,
+  updateUserInfo,
+  removeUserInfo
+} = useMatomo();
+```
 
-The following methods are available with the `useMatomo` hook.
+### trackAppStart(options?)
 
-### trackAppStart({ userInfo = {} } = {})
+Tracks app start with automatic platform detection. **All parameters are optional.**
 
-Tracks app start as action with prefixed 'App' category: `App / start`.
+```typescript
+// Simple usage - automatic platform detection
+await trackAppStart();
 
-Param      | Description
----------- | -----------
-`userInfo` | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+// With custom options
+await trackAppStart({
+  url: '/home',
+  referrer: 'https://mywebsite.com',
+  platform: 'ios', // Will auto-detect if not provided
+  userAgent: 'MyApp/1.0', // Will auto-generate if not provided
+  userInfo: { userId: 'user123' }
+});
+```
 
-### trackScreenView({ name, url, userInfo = {} })
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `url` | `string` | Custom URL for the app start event |
+| `referrer` | `string` | Referrer URL (urlref parameter) |
+| `platform` | `string` | Platform override (auto-detected from Platform.OS) |
+| `userAgent` | `string` | Custom user agent (auto-generated if not provided) |
+| `userInfo` | `MatomoUserInfo` | Additional user information |
 
-Tracks screen view as action with prefixed 'Screen' category: `Screen / ${name}`
+### trackPageView(options)
 
-Param      | Description
----------- | -----------
-`name`     | The title of the action being tracked. It is possible to use slashes / to set one or several categories for this action. For example, Help / Feedback will create the Action Feedback in the category Help.
-`url`      | The full URL for the current action.
-`userInfo` | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+Tracks page/screen views with enhanced parameters:
 
-### trackAction({ name, url, userInfo = {} })
+```typescript
+await trackPageView({
+  name: 'Home Screen', // Required
+  url: '/home',
+  referrer: 'https://external-site.com',
+  userInfo: { userId: 'user123' }
+});
+```
 
-Tracks actions
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | `string` | ✅ | Screen/page name |
+| `url` | `string` | ❌ | Page URL |
+| `referrer` | `string` | ❌ | Referrer URL |
+| `userInfo` | `MatomoUserInfo` | ❌ | User information |
 
-Doc: https://developer.matomo.org/api-reference/tracking-api#recommended-parameters
+### trackEvent(options)
 
-Param      | Description
----------- | -----------
-`name`     | The title of the action being tracked. It is possible to use slashes / to set one or several categories for this action. For example, Help / Feedback will create the Action Feedback in the category Help.
-`url`      | The full URL for the current action.
-`userInfo` | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+Tracks custom events:
 
-### trackEvent({ category, action, name, value, campaign, url, userInfo = {} })
+```typescript
+await trackEvent({
+  category: 'User Interaction', // Required
+  action: 'Button Press', // Required
+  name: 'Sign Up Button',
+  value: 1,
+  url: '/signup',
+  campaign: 'summer-promo',
+  userInfo: { userId: 'user123' }
+});
+```
 
-Tracks custom events
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `category` | `string` | ✅ | Event category |
+| `action` | `string` | ✅ | Event action |
+| `name` | `string` | ❌ | Event name |
+| `value` | `number` | ❌ | Numeric event value |
+| `url` | `string` | ❌ | Associated URL |
+| `campaign` | `string` | ❌ | Campaign identifier |
+| `userInfo` | `MatomoUserInfo` | ❌ | User information |
 
-Doc: https://developer.matomo.org/api-reference/tracking-api#optional-event-trackinghttpsmatomoorgdocsevent-tracking-info
+### trackAction(options)
 
-Param      | Description
----------- | -----------
-`category` | The event category. Must not be empty. (eg. Videos, Music, Games...)
-`action`   | The event action. Must not be empty. (eg. Play, Pause, Duration, Add Playlist, Downloaded, Clicked...)
-`name`     | The event name. (eg. a Movie name, or Song name, or File name...)
-`value`    | The event value. Must be a float or integer value (numeric), not a string.
-`campaign` | The event related campaign.
-`url`      | The full URL for the current action.
-`userInfo` | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+Tracks general actions:
 
-### trackContent({ name, piece, target, interaction, url, userInfo = {} })
+```typescript
+await trackAction({
+  name: 'Help / Contact Form', // Required - supports categories with /
+  url: '/help/contact',
+  userInfo: { userId: 'user123' }
+});
+```
 
-Tracks content impressions or interactions
+### trackContent(options)
 
-Doc: https://developer.matomo.org/api-reference/tracking-api#optional-content-trackinghttpsmatomoorgdocscontent-tracking-info
+Tracks content impressions and interactions:
 
-Param         | Description
---------------| -----------
-`name`        | The name of the content. For instance 'Ad Foo Bar'.
-`piece`       | The actual content piece. For instance the path to an image, video, audio, any text.
-`target`      | The target of the content. For instance the URL of a landing page.
-`interaction` | The name of the interaction with the content. For instance a 'click'.
-`url`         | The full URL for the current action.
-`userInfo`    | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+```typescript
+await trackContent({
+  name: 'Banner Ad', // Required
+  piece: '/images/banner.jpg',
+  target: 'https://example.com',
+  interaction: 'click',
+  url: '/home',
+  userInfo: { userId: 'user123' }
+});
+```
 
-### trackSiteSearch({ keyword, category, count, url, userInfo = {} })
+### trackSiteSearch(options)
 
-Tracks site search
+Tracks site search queries:
 
-Doc: https://developer.matomo.org/api-reference/tracking-api#optional-action-info-measure-page-view-outlink-download-site-search
+```typescript
+await trackSiteSearch({
+  keyword: 'react native', // Required
+  category: 'documentation',
+  count: 42,
+  url: '/search',
+  userInfo: { userId: 'user123' }
+});
+```
 
-Param       | Description
------------ | -----------
-`keyword`   | The Site Search keyword. When specified, the request will not be tracked as a normal pageview but will instead be tracked as a Site Search request.
-`category`  | When `keyword` is specified, you can optionally specify a search category with this parameter.
-`count`     | When `keyword` is specified, it is also recommended setting the search_count to the number of search results displayed on the results page. When keywords are tracked with &search_count=0 they will appear in the "No Result Search Keyword" report.
-`url`       | The full URL for the current action.
-`userInfo`  | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+### trackLink(options) & trackDownload(options)
 
-### trackLink({ link, url, userInfo = {} })
+Track external links and downloads:
 
-Tracks outgoing links to other sites
+```typescript
+await trackLink({
+  link: 'https://external-site.com', // Required
+  url: '/current-page'
+});
 
-Doc: https://developer.matomo.org/api-reference/tracking-api#optional-action-info-measure-page-view-outlink-download-site-search
+await trackDownload({
+  download: 'https://example.com/file.pdf', // Required
+  url: '/downloads'
+});
+```
 
-Param      | Description
----------- | -----------
-`link`     | An external URL the user has opened. Used for tracking outlink clicks.
-`url`      | The full URL for the current action.
-`userInfo` | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+### User Information Management
 
-### trackDownload({ download, url, userInfo = {} })
+```typescript
+// Update user info
+await updateUserInfo({
+  userInfo: { userId: 'user123', customData: { plan: 'premium' } }
+});
 
-Tracks downloads
+// Remove user info
+await removeUserInfo();
+```
 
-Doc: https://developer.matomo.org/api-reference/tracking-api#optional-action-info-measure-page-view-outlink-download-site-search
+## TypeScript Support
 
-Param      | Description
----------- | -----------
-`download` | URL of a file the user has downloaded. Used for tracking downloads.
-`url`      | The full URL for the current action.
-`userInfo` | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+This package is written in TypeScript and provides comprehensive type definitions:
 
-### updateUserInfo({ userInfo = {} })
+```typescript
+import {
+  MatomoTracker,
+  MatomoProvider,
+  useMatomo,
+  MatomoUserInfo,
+  MatomoTrackEventOptions,
+  MatomoTrackPageViewOptions,
+  MatomoTrackAppStartOptions,
+  MatomoInitOptions
+} from 'matomo-react-native';
+```
 
-Updates user information for tracking purposes.
+### Type Definitions
 
-Doc: https://developer.matomo.org/api-reference/tracking-api#optional-user-info
+```typescript
+interface MatomoUserInfo {
+  userId?: string;
+  visitorId?: string;
+  customData?: Record<string, any>;
+  // ... additional user info fields
+}
 
-Param      | Description
----------- | -----------
-`userInfo` | Optional data used for tracking different user info, see https://developer.matomo.org/api-reference/tracking-api#optional-user-info.
+interface MatomoTrackEventOptions {
+  category: string;
+  action: string;
+  name?: string;
+  value?: number;
+  url?: string;
+  campaign?: string;
+  userInfo?: MatomoUserInfo;
+}
 
-### removeUserInfo()
+// All tracking options have comprehensive type definitions
+```
 
-Removes user information for tracking purposes.
+## Platform Detection
 
+The package automatically detects the platform using React Native's `Platform.OS`:
+
+- **iOS**: Sends appropriate iOS user agents and platform identifiers
+- **Android**: Sends Android-specific tracking data
+- **Web**: Detects web platform when running in browser environments
+- **Custom**: Allows manual override for custom platforms
+
+```typescript
+import { Platform } from 'react-native';
+
+// Automatic detection
+console.log(Platform.OS); // 'ios', 'android', 'web', etc.
+
+// The tracker uses this automatically, but you can override:
+await trackAppStart({
+  platform: 'custom-platform',
+  userAgent: 'MyCustomApp/1.0'
+});
+```
+
+## Migration from Original Package
+
+If you're migrating from `matomo-tracker-react-native`, the API is fully backward compatible:
+
+1. Update your package.json:
+```diff
+- "matomo-tracker-react-native": "^0.3.3"
++ "matomo-react-native": "^1.0.0"
+```
+
+2. Update imports:
+```diff
+- import MatomoTracker, { MatomoProvider, useMatomo } from 'matomo-tracker-react-native';
++ import MatomoTracker, { MatomoProvider, useMatomo } from 'matomo-react-native';
+```
+
+3. Your existing tracking calls work unchanged:
+```typescript
+// This still works exactly the same
+const { trackAppStart, trackEvent } = useMatomo();
+await trackAppStart();
+await trackEvent({ category: 'test', action: 'click' });
+```
+
+4. Optionally, take advantage of new features:
+```typescript
+// New enhanced features
+await trackAppStart({
+  referrer: 'https://mysite.com',
+  platform: 'ios' // or let it auto-detect
+});
+```
+
+## Examples
+
+### Basic Setup
+```typescript
+import React from 'react';
+import { App } from './App';
+import MatomoTracker, { MatomoProvider } from 'matomo-react-native';
+
+const tracker = new MatomoTracker({
+  urlBase: 'https://your-matomo.com',
+  siteId: 1
+});
+
+export default function AppWrapper() {
+  return (
+    <MatomoProvider instance={tracker}>
+      <App />
+    </MatomoProvider>
+  );
+}
+```
+
+### Navigation Tracking
+```typescript
+import { useMatomo } from 'matomo-react-native';
+import { useEffect } from 'react';
+
+function HomeScreen({ route }) {
+  const { trackPageView } = useMatomo();
+  
+  useEffect(() => {
+    trackPageView({
+      name: 'Home Screen',
+      url: route.name
+    });
+  }, []);
+  
+  return <YourHomeComponent />;
+}
+```
+
+### Event Tracking
+```typescript
+function SignUpButton() {
+  const { trackEvent } = useMatomo();
+  
+  const handlePress = async () => {
+    await trackEvent({
+      category: 'User Interaction',
+      action: 'Button Press',
+      name: 'Sign Up',
+      value: 1
+    });
+    
+    // Continue with your sign up logic
+  };
+  
+  return <Button onPress={handlePress} title="Sign Up" />;
+}
+```
+
+## Contributing
+
+Contributions are welcome! This package builds upon the excellent foundation of the original `matomo-tracker-react-native`. 
+
+Please see the original repository for contribution guidelines: [donni106/matomo-tracker-react-native](https://github.com/donni106/matomo-tracker-react-native)
+
+## License
+
+This package maintains the same license as the original project. See [LICENSE](./LICENSE) for details.
 
 ## Changelog
 
-Have a look at the [changelog](./CHANGELOG.md) to be up to date with the development process.
-
+See [CHANGELOG.md](./CHANGELOG.md) for version history and updates.
 
 ---
 
-###### Version: 0.3.3
+**Enhanced TypeScript version** | Based on [donni106/matomo-tracker-react-native](https://github.com/donni106/matomo-tracker-react-native) | Version 1.0.0
