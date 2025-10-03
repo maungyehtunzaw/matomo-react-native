@@ -1,6 +1,6 @@
 {
   "name": "matomo-react-native",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Enhanced Matomo tracking library for React Native and Expo projects with TypeScript support and automatic platform detection.",
   "license": "MIT",
   "repository": {

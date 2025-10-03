@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v1.0.4] - 2025-10-03
+
+### Added
+
+- **New convenience tracking methods for marketing and advertising analytics:**
+  - `trackReferralUrl()` - Track referral sources with automatic campaign attribution
+  - `trackAdClick()` - Track advertisement clicks using Matomo content tracking
+  - `trackAdImpression()` - Track advertisement impressions for visibility measurement
+- Added `contentInteraction` parameter to `trackContent()` method for tracking user interactions
+- Comprehensive test suite with 8 new tests covering all tracking scenarios
+- Full documentation in README with usage examples for new methods
+
+### Changed
+
+- Enhanced TypeScript types with new interfaces: `MatomoTrackReferralUrlOptions`, `MatomoTrackAdClickOptions`, `MatomoTrackAdImpressionOptions`
+- Updated `MatomoTrackContentOptions` to include optional `contentInteraction` field
+
 ## [v0.3.3]
 
 Adjust tracking methods
