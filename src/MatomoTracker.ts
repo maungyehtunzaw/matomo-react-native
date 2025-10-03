@@ -10,6 +10,9 @@ import {
   MatomoTrackSiteSearchOptions,
   MatomoTrackLinkOptions,
   MatomoTrackDownloadOptions,
+  MatomoTrackReferralUrlOptions,
+  MatomoTrackAdClickOptions,
+  MatomoTrackAdImpressionOptions,
   getPlatformInfo,
   generateUserAgent
 } from './types';
@@ -258,18 +261,25 @@ class MatomoTracker {
    *
    * @see {@link https://developer.matomo.org/api-reference/tracking-api#optional-content-trackinghttpsmatomoorgdocscontent-tracking-info|Matomo Tracking API - Content Tracking}
    */
-  trackContent({ contentName, contentPiece, contentTarget, url, userInfo = {} }: MatomoTrackContentOptions): Promise<void> {
+  trackContent({ contentName, contentPiece, contentTarget, contentInteraction, url, userInfo = {} }: MatomoTrackContentOptions): Promise<void> {
     if (!contentName) {
       throw new Error('Error: The "contentName" parameter is required for tracking a content.');
     }
     this.updateUserInfo(userInfo);
 
-    return this.track({
+    const trackData: Record<string, any> = {
       c_n: contentName,
       c_p: contentPiece,
       c_t: contentTarget,
       url,
-    });
+    };
+
+    // Add interaction if provided (for tracking clicks/interactions)
+    if (contentInteraction) {
+      trackData.c_i = contentInteraction;
+    }
+
+    return this.track(trackData);
   }
 
   /**
@@ -373,6 +383,113 @@ class MatomoTracker {
    */
   removeUserInfo(): void {
     this.userInfo = {};
+  }
+
+  /**
+   * Tracks a referral URL for attribution tracking.
+   * 
+   * This convenience method tracks where users came from by recording referral information
+   * as an event with proper campaign attribution.
+   *
+   * @param {MatomoTrackReferralUrlOptions} options - Options for tracking the referral.
+   * @returns {Promise<void>} A Promise that resolves when the referral tracking is complete.
+   *
+   * @example
+   * // Track a referral from social media
+   * trackReferralUrl({
+   *   referralUrl: 'https://facebook.com/post/123',
+   *   source: 'facebook',
+   *   medium: 'social',
+   *   campaign: 'summer-2024'
+   * });
+   */
+  trackReferralUrl({ referralUrl, campaign, source, medium, url, userInfo = {} }: MatomoTrackReferralUrlOptions): Promise<void> {
+    this.updateUserInfo(userInfo);
+
+    return this.trackEvent({
+      category: 'Referral',
+      action: 'Visit',
+      name: source || new URL(referralUrl).hostname,
+      campaign: campaign,
+      url: url,
+      userInfo: {
+        ...userInfo,
+        urlref: referralUrl,
+        // Store referral info in custom data if needed
+        referralSource: source,
+        referralMedium: medium
+      }
+    });
+  }
+
+  /**
+   * Tracks an advertisement click.
+   * 
+   * Uses Matomo's content tracking to record when users click on advertisements,
+   * providing insights into ad performance and user engagement.
+   *
+   * @param {MatomoTrackAdClickOptions} options - Options for tracking the ad click.
+   * @returns {Promise<void>} A Promise that resolves when the ad click tracking is complete.
+   *
+   * @example
+   * // Track a banner ad click
+   * trackAdClick({
+   *   adId: 'banner-001',
+   *   adName: 'Summer Sale Banner',
+   *   adSource: 'homepage',
+   *   adCampaign: 'summer-2024',
+   *   targetUrl: 'https://example.com/sale'
+   * });
+   */
+  trackAdClick({ adId, adName, adSource, adCampaign, targetUrl, url, userInfo = {} }: MatomoTrackAdClickOptions): Promise<void> {
+    this.updateUserInfo(userInfo);
+
+    return this.trackContent({
+      contentName: `Ad: ${adName}`,
+      contentPiece: adId,
+      contentTarget: targetUrl || '',
+      contentInteraction: 'click',
+      url: url,
+      userInfo: {
+        ...userInfo,
+        adSource,
+        adCampaign
+      }
+    });
+  }
+
+  /**
+   * Tracks an advertisement impression (view).
+   * 
+   * Records when an advertisement is displayed to users, helping measure
+   * ad visibility and reach.
+   *
+   * @param {MatomoTrackAdImpressionOptions} options - Options for tracking the ad impression.
+   * @returns {Promise<void>} A Promise that resolves when the ad impression tracking is complete.
+   *
+   * @example
+   * // Track a banner ad impression
+   * trackAdImpression({
+   *   adId: 'banner-001',
+   *   adName: 'Summer Sale Banner',
+   *   adSource: 'homepage',
+   *   adCampaign: 'summer-2024'
+   * });
+   */
+  trackAdImpression({ adId, adName, adSource, adCampaign, url, userInfo = {} }: MatomoTrackAdImpressionOptions): Promise<void> {
+    this.updateUserInfo(userInfo);
+
+    return this.trackContent({
+      contentName: `Ad: ${adName}`,
+      contentPiece: adId,
+      contentTarget: '',
+      url: url,
+      userInfo: {
+        ...userInfo,
+        adSource,
+        adCampaign
+      }
+    });
   }
 
   /**

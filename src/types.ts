@@ -78,6 +78,7 @@ export interface MatomoTrackContentOptions {
   contentName: string;
   contentPiece?: string;
   contentTarget?: string;
+  contentInteraction?: string; // For tracking interactions like 'click'
   url?: string;
   userInfo?: MatomoUserInfo;
 }
@@ -103,6 +104,35 @@ export interface MatomoTrackDownloadOptions {
   userInfo?: MatomoUserInfo;
 }
 
+// Enhanced tracking options for convenience methods
+export interface MatomoTrackReferralUrlOptions {
+  referralUrl: string;
+  campaign?: string;
+  source?: string;
+  medium?: string;
+  url?: string;
+  userInfo?: MatomoUserInfo;
+}
+
+export interface MatomoTrackAdClickOptions {
+  adId: string;
+  adName: string;
+  adSource?: string;
+  adCampaign?: string;
+  targetUrl?: string;
+  url?: string;
+  userInfo?: MatomoUserInfo;
+}
+
+export interface MatomoTrackAdImpressionOptions {
+  adId: string;
+  adName: string;
+  adSource?: string;
+  adCampaign?: string;
+  url?: string;
+  userInfo?: MatomoUserInfo;
+}
+
 export interface MatomoTrackerInstance {
   trackAppStart: (options?: MatomoTrackAppStartOptions) => Promise<void>;
   trackPageView: (options: MatomoTrackPageViewOptions) => Promise<void>;
@@ -113,6 +143,9 @@ export interface MatomoTrackerInstance {
   trackSiteSearch: (options: MatomoTrackSiteSearchOptions) => Promise<void>;
   trackLink: (options: MatomoTrackLinkOptions) => Promise<void>;
   trackDownload: (options: MatomoTrackDownloadOptions) => Promise<void>;
+  trackReferralUrl: (options: MatomoTrackReferralUrlOptions) => Promise<void>;
+  trackAdClick: (options: MatomoTrackAdClickOptions) => Promise<void>;
+  trackAdImpression: (options: MatomoTrackAdImpressionOptions) => Promise<void>;
   updateUserInfo: (userInfo: MatomoUserInfo) => void;
   removeUserInfo: () => void;
 }
@@ -129,6 +162,9 @@ export interface MatomoHook {
   trackDownload: (params: MatomoTrackDownloadOptions) => Promise<void> | undefined;
   updateUserInfo: (params: MatomoUserInfo) => void | undefined;
   removeUserInfo: () => void | undefined;
+  trackReferralUrl: (params: MatomoTrackReferralUrlOptions) => Promise<void> | undefined;
+  trackAdClick: (params: MatomoTrackAdClickOptions) => Promise<void> | undefined;
+  trackAdImpression: (params: MatomoTrackAdImpressionOptions) => Promise<void> | undefined;
 }
 
 // Utility functions for platform detection

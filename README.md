@@ -311,6 +311,58 @@ await updateUserInfo({
 await removeUserInfo();
 ```
 
+### trackReferralUrl(options) - NEW!
+
+Tracks referral sources for attribution:
+
+```typescript
+await trackReferralUrl({
+  referralUrl: 'https://facebook.com/post/123', // Required
+  source: 'facebook', // Optional - auto-extracted from URL
+  medium: 'social',
+  campaign: 'summer-2024',
+  url: '/landing-page',
+  userInfo: { userId: 'user123' }
+});
+```
+
+This method tracks where users came from by recording referral information as an event with proper campaign attribution. Perfect for measuring marketing campaign effectiveness!
+
+### trackAdClick(options) - NEW!
+
+Tracks advertisement clicks using content tracking:
+
+```typescript
+await trackAdClick({
+  adId: 'banner-001', // Required
+  adName: 'Summer Sale Banner', // Required
+  adSource: 'homepage',
+  adCampaign: 'summer-2024',
+  targetUrl: 'https://example.com/sale',
+  url: '/home',
+  userInfo: { userId: 'user123' }
+});
+```
+
+Records when users click on advertisements, providing insights into ad performance and engagement.
+
+### trackAdImpression(options) - NEW!
+
+Tracks advertisement impressions (views):
+
+```typescript
+await trackAdImpression({
+  adId: 'banner-001', // Required
+  adName: 'Summer Sale Banner', // Required
+  adSource: 'homepage',
+  adCampaign: 'summer-2024',
+  url: '/home',
+  userInfo: { userId: 'user123' }
+});
+```
+
+Records when advertisements are displayed to users, helping measure ad visibility and reach. Perfect for tracking ad performance and calculating CTR (Click-Through Rate)!
+
 ## TypeScript Support
 
 This package is written in TypeScript and provides comprehensive type definitions:
@@ -464,6 +516,76 @@ function SignUpButton() {
   };
   
   return <Button onPress={handlePress} title="Sign Up" />;
+}
+```
+
+### Ad Tracking Example
+```typescript
+function AdBanner({ adId, adName, targetUrl }) {
+  const { trackAdImpression, trackAdClick } = useMatomo();
+  
+  useEffect(() => {
+    // Track ad impression when component mounts
+    trackAdImpression({
+      adId,
+      adName,
+      adSource: 'app-banner',
+      adCampaign: 'summer-2024'
+    });
+  }, [adId]);
+  
+  const handleAdClick = async () => {
+    // Track ad click
+    await trackAdClick({
+      adId,
+      adName,
+      adSource: 'app-banner',
+      adCampaign: 'summer-2024',
+      targetUrl
+    });
+    
+    // Navigate to ad target
+    Linking.openURL(targetUrl);
+  };
+  
+  return (
+    <TouchableOpacity onPress={handleAdClick}>
+      <Image source={{ uri: adImage }} />
+    </TouchableOpacity>
+  );
+}
+```
+
+### Referral Tracking Example
+```typescript
+function App() {
+  const { trackReferralUrl } = useMatomo();
+  
+  useEffect(() => {
+    // Track referral from deep link
+    const handleDeepLink = async (url) => {
+      const referrer = getReferrerFromUrl(url);
+      
+      if (referrer) {
+        await trackReferralUrl({
+          referralUrl: referrer,
+          source: 'deep-link',
+          medium: 'app',
+          campaign: getCampaignFromUrl(url)
+        });
+      }
+    };
+    
+    // Setup deep link listener
+    Linking.getInitialURL().then(handleDeepLink);
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      handleDeepLink(url);
+    });
+    
+    return () => subscription.remove();
+  }, []);
+  
+  return <YourApp />;
 }
 ```
 
