@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v1.0.5] - 2025-10-07
+
+### Fixed
+
+- **Fixed `trackDownload` and `trackLink` not appearing in Matomo dashboard:**
+  - Both methods now automatically set the `url` parameter when not provided
+  - `trackDownload` uses download URL as fallback for `url` parameter
+  - `trackLink` uses link URL as fallback for `url` parameter
+  - This follows Matomo API recommendation: "We recommend to also set the url parameter to this same value"
+  - Download tracking now properly appears in Behaviour > Downloads report
+  - Outlink tracking now properly appears in Behaviour > Outlinks report
+
 ## [v1.0.4] - 2025-10-03
 
 ### Added

@@ -340,7 +340,12 @@ class MatomoTracker {
     }
     this.updateUserInfo(userInfo);
 
-    return this.track({ link, url });
+    // Matomo recommendation: also set url parameter to the link URL
+    // See: https://developer.matomo.org/api-reference/tracking-api#optional-action-info-measure-page-view-outlink-download-site-search
+    return this.track({ 
+      link, 
+      url: url || link // Use provided url or fallback to link URL
+    });
   }
 
   /**
@@ -368,7 +373,12 @@ class MatomoTracker {
     }
     this.updateUserInfo(userInfo);
 
-    return this.track({ download, url });
+    // Matomo recommendation: also set url parameter to the download URL
+    // See: https://developer.matomo.org/api-reference/tracking-api#optional-action-info-measure-page-view-outlink-download-site-search
+    return this.track({ 
+      download, 
+      url: url || download // Use provided url or fallback to download URL
+    });
   }
 
   /**
