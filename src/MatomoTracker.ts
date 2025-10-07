@@ -238,7 +238,7 @@ class MatomoTracker {
       e_n: name,
       e_v: value,
       mtm_campaign: campaign,
-      url,
+      url: url || undefined, // Will be auto-generated if not provided
     });
   }
 
@@ -271,7 +271,7 @@ class MatomoTracker {
       c_n: contentName,
       c_p: contentPiece,
       c_t: contentTarget,
-      url,
+      url: url || undefined, // Will be auto-generated if not provided
     };
 
     // Add interaction if provided (for tracking clicks/interactions)
@@ -311,7 +311,7 @@ class MatomoTracker {
       search: keyword,
       search_cat: category,
       search_count: count,
-      url,
+      url: url || undefined, // Will be auto-generated if not provided
     });
   }
 

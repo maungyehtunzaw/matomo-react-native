@@ -9,13 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- **Fixed `trackDownload` and `trackLink` not appearing in Matomo dashboard:**
-  - Both methods now automatically set the `url` parameter when not provided
-  - `trackDownload` uses download URL as fallback for `url` parameter
-  - `trackLink` uses link URL as fallback for `url` parameter
-  - This follows Matomo API recommendation: "We recommend to also set the url parameter to this same value"
+- **Fixed "Page URL not defined" errors in Matomo dashboard:**
+  - `trackEvent()` now auto-generates URL when not provided (prevents "Page URL not defined")
+  - `trackContent()` now auto-generates URL when not provided
+  - `trackSiteSearch()` now auto-generates URL when not provided
+  - `trackDownload()` now automatically sets `url` parameter to download URL
+  - `trackLink()` now automatically sets `url` parameter to link URL
+  - All tracking methods now follow Matomo API recommendation: "url parameter is RECOMMENDED for all tracking requests"
+  - Fixes GitHub issues [#11257](https://github.com/matomo-org/matomo/issues/11257) and [#8909](https://github.com/matomo-org/matomo/issues/8909)
   - Download tracking now properly appears in Behaviour > Downloads report
   - Outlink tracking now properly appears in Behaviour > Outlinks report
+  - Events, content, and site searches now show proper URLs instead of "Page URL not defined"
 
 ## [v1.0.4] - 2025-10-03
 
