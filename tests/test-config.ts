@@ -9,6 +9,7 @@ export const testMatomoConfig = {
   disabled: false
 };
 
+
 // Create test instance
 export const createTestInstance = () => new MatomoTracker(testMatomoConfig);
 
